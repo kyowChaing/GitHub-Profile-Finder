@@ -22,7 +22,10 @@ document.querySelector('#search').addEventListener('submit', async (e)=>{
     e.preventDefault();
     const userName=document.querySelector('#findByUsername').value;
     const profile = await getUser(userName);
+    const repLst= await getRepository(profile);
+
     showProfile(profile);
+    showRepository(repLst);
 });
 
 //Show profile into UI dynamically
@@ -55,6 +58,31 @@ function showProfile(profile){
           <p class="location">
             <ion-icon name="location-outline"></ion-icon>${profile.location}
           </p>`;
-
 }
-    
+
+//Get repository list and Show   
+
+async function getRepository(profile){
+    const res= await fetch(`${profile.repos_url}?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&per_page=10`);
+    const repo = await res.json();
+    return repo;
+}
+
+function showRepository(repos){
+    let newHtml='';
+    for (const repo of repos) {
+        newHtml +=`
+        <div class="repo">
+        <div class="repo_name">
+          <a href="${repo.html_url}">${repo.name}</a>
+        </div>
+        <p>
+          <span class="circle"></span> ${repo.language}
+          <ion-icon name="star-outline"></ion-icon>${repo.watchers}
+          <ion-icon name="git-branch-outline"></ion-icon>${repo.forks_count}
+        </p>
+      </div>
+        `
+    }
+    document.querySelector('.repos').innerHTML=newHtml;
+}

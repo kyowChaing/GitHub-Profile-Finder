@@ -26,3 +26,4 @@ if user not found show not found page
     //function showProfile(profile)
     // select .profile class div and add dynamically user data into HTML page by innerHTML property
 
+///show max 10 repositories of user in one page
