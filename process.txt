@@ -1,0 +1,6 @@
+search for github user by user ida and show into HTML pag - frofile name,img,repositories
+if user not found show not found page
+
+//api.github.com/users
+//"repos_url": "https://api.github.com/users/mojombo/repos"
+
