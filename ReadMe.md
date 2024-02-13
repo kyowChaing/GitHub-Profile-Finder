@@ -1,1 +1,1 @@
-Github profile finder Using Github API Key
+Github profile finder Using Github API Key with JVASCRIPT DOM Event Handler

@@ -3,31 +3,59 @@
  const CLIENT_ID='e30a232b3a69237028cb';
  const CLIENT_SECRET ='9025619286a55edc7881ca87528f3171663a1586';
 
-myProfile();
-async function myProfile(){
-   const myprofile= await fetch(`https://api.github.com/users/KyowChaing?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`);
-   const profile= await myprofile.json()
-    showProfile(profile);
+//this code block show by default My GitHub Link profile when page reload
+ let show=true;
+myProfile(show);
+async function myProfile(show){
+    if (show) {
+        document.querySelector('#findByUsername').focus();
+        const myprofile= await fetch(`https://api.github.com/users/KyowChaing?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`);
+        const profile= await myprofile.json()
+        showProfile(profile);
+        const repLst= await getRepository(profile);
+        showRepository(repLst);
+    } else {
+        document.querySelector('.user-details').style.display="none";
+    }
 }
  
-async function getUser(name){
-    const resposnse= await fetch(`https://api.github.com/users/${name}?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`);
-    const profile=await resposnse.json();
-    return profile;
-}
+
 
 //fetch data according user search by from submit [add event listener]
 
 document.querySelector('#search').addEventListener('submit', async (e)=>{
     e.preventDefault();
     const userName=document.querySelector('#findByUsername').value;
-    const profile = await getUser(userName);
-    const repLst= await getRepository(profile);
+    if (userName.length>0) {
+      document.querySelector('.loader').style.display='block';  //adding loader to show during fetching data
+      document.querySelector('.user-details').style.display='none'; //hidding user-details UI during loading
+      document.querySelector('.notFound').style.display='none';  //hidding user-details UI during loading
 
-    showProfile(profile);
-    showRepository(repLst);
+      const profile = await getUser(userName);
+      document.querySelector('.loader').style.display='none';  //hidding  loader after  fetching data
+       
+      if(profile.message==="Not Found"){
+            document.querySelector('.notFound').style.display='block';
+            const userExist= false;
+            myProfile(userExist);
+        }else{
+            showProfile(profile);
+            document.querySelector('.user-details').style.display='flex';//making display none to flex
+            const repLst= await getRepository(profile);
+            showRepository(repLst);
+        }
+        document.querySelector('#findByUsername').value='';  //input form reset
+    }
+
 });
 
+
+//get github user Profile Information
+async function getUser(name){
+    const resposnse= await fetch(`https://api.github.com/users/${name}?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`);
+    const profile=await resposnse.json();
+    return profile;
+}
 //Show profile into UI dynamically
 
 function showProfile(profile){
@@ -67,7 +95,7 @@ async function getRepository(profile){
     const repo = await res.json();
     return repo;
 }
-
+//Repository info show
 function showRepository(repos){
     let newHtml='';
     for (const repo of repos) {
